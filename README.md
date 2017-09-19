@@ -14,7 +14,7 @@
 
 ## Problem statement and rationale
 
-Currently, when an object is destructured by assignment to a left-hand-side _{Object,Array}BindingPattern_, the bound identifiers become "snapshots" of the state of the object at the moment of destructuring:
+Currently, when an object is destructured by assignment to a left-hand-side _ObjectBindingPattern_, the bound identifiers become "snapshots" of the state of the object at the moment of destructuring:
 
 ```js
 let obj = { a: 1, b: 2 };
