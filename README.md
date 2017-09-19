@@ -340,13 +340,85 @@ The syntax this proposal introduces doesn't really fit this traditional definiti
 
 Is there a better term for what this proposal introduces?
 
+
 ### Deeper nesting?
+
+A single `&` character declares a reference whose evaluation involves only one object property lookup:
+
+```js
+const { a: { b: { &c, d }}} = obj;
+console.log(c); // same as console.log(p.c), where p === original value of obj.a.b
+console.log(d); // same as any normal bound identifier (not a reference)
+```
+
+By extension, it's easy to imagine a chain of multiple `&` keys declaring a reference to a series of property lookups:
+
+```js
+const { &a: { &b: { &c, d }}} = obj;
+console.log(c); // same as console.log(obj.a.b.c);
+console.log(d); // same as before
+```
+
+The question to answer is whether all possible combinations of this syntax make sense:
+
+```js
+const {  a: {  b: { &c }}} = obj; // ok
+const {  a: { &b: {  c }}} = obj; // ??
+const {  a: { &b: { &c }}} = obj; // ok
+const { &a: {  b: {  c }}} = obj; // ??
+const { &a: {  b: { &c }}} = obj; // ??
+const { &a: { &b: {  c }}} = obj; // ??
+const { &a: { &b: { &c }}} = obj; // ok
+```
+
+Since `c` is the only bound identifier, only those variations with `&c` make sense to me, and `&a` without `&b` seems pointless unless the `&a` object pattern contains other reference keys.
+
+However, uselessness does not always imply illegality, so perhaps all these variations should be legal, and it should be the job of linters to point out questionable patterns.
 
 
 ### Array patterns?
 
+It is tempting to allow `&` in an _ArrayBindingPattern_, like so:
+
+```js
+const [a, &b] = elements;
+console.log(b); // same as console.log(elements[1])?
+```
+
+However, this use of `&` feels different, because the `&` isn't prefixing a key of an object, but an identifier bound by the destructuring pattern.
+
+The following code should work, though it certainly feels awkward:
+
+```js
+const { 0: a, &1: b } = elements;
+console.log(b); // same as console.log(elements[1])
+```
+
+I would prefer to restrict this proposal to _ObjectBindingPattern_ destructuring, unless there is a strong argument for supporting array patterns as well.
+
 
 ### Assignment patterns?
 
+A variable declared with a `&` is a fundamentally different sort of variable, so it's not clear what (if anything) the following code should mean:
+
+```js
+let a, b;
+({ a, &b } = obj);
+```
+
+Again, I suppose this syntax could be made to do something useful, but I would prefer to forbid it until a compelling argument appears.
+
 
 ### Interaction with TypeScript and/or Flow syntax?
+
+Type annotations tend to be a source of surprising syntactic conflicts, so I want to be mindful that `&` may pose problems for TypeScript and/or Flow.
+
+With that said, object destructuring is a syntax that both TypeScript and Flow have to deal with, so I am optimistic that `&` should not be a source of (m)any additional problems.
+
+In TypeScript, the type annotations for an object destructuring pattern are completely separate from the pattern itself, so the syntax within the pattern should be the same as usual:
+
+```js
+let { a, &b: c }: { a: string, c: number } = obj;
+```
+
+Flow has an open [issue](https://github.com/facebook/flow/issues/235) about this topic.
