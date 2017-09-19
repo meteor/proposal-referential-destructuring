@@ -213,13 +213,13 @@ Two concerns were raised during that discussion that led to my withdrawing the n
 
 2. Synchronous `import` declarations seemed at odds with a future in which module evaluation may be asynchronous, thanks to the possibility of top-level `await`.
 
-Since I first presented that proposal, I've become convinced that the answer to the first objection is that the runtime should make no special effort to fetch the code for modules imported in nested contexts. It's simply the responsibility of the pogrammer to use a bundling tool that ensure the code is synchronously available.
+Since I first presented that proposal, I've become convinced that the answer to the first objection is that the runtime should make no special effort to fetch the code for modules imported in nested contexts. It's simply the responsibility of the programmer to use a bundling tool that ensure the code is synchronously available.
 
 I do not have a perfect solution for the second objection, other than to throw if a nested `import` declaration tries to import an asynchronous module, which should encourage the programmer to hoist the `import` declaration to the top level, or use dynamic `import()`.
 
 While I could argue that these solutions are good enough to justify reviving the nested `import` proposal, the truth is that dynamic `import()` solves both problems already, and has much more momentum as an ECMAScript proposal.
 
-My one remaining regret is the loss of live bindings when using dynamic `import()` and destructuring together. In addition to its other benefits, referential destructuring solves this exact problem, and **I would be happy to withdraw the nested `import` proposal permanently if referential destructuring gains traction with the committee.**
+My one remaining regret is the loss of live bindings when using dynamic `import()` and destructuring together. In addition to its other benefits, referential destructuring solves exactly this problem, and so **I would be happy to withdraw the nested `import` proposal permanently if referential destructuring gains traction with the committee.**
 
 
 ## Relationship to [Babel](http://babeljs.io/)
