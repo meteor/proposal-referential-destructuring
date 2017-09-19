@@ -108,7 +108,10 @@ If this mutability is undesirable, simply use a `const` destructuring declaratio
 ```js
 const obj = { x: 1234 };
 const { &x: y } = obj;
-y += 1111; // throws
+console.log(y); // 1234
+obj.x += 1111; // ok
+console.log(y); // 2345
+y += 2222; // throws
 ```
 
 As in other languages that support references, `const` references are likely to be regarded as a best practice, just as `const` declarations are preferred wherever possible.
