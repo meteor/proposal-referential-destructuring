@@ -226,6 +226,7 @@ Babel could simply generate
 
 ```js
 const { &a, &b: c } = require("./module");
+console.log(a, c);
 ```
 
 and then transpile the referential destructuring syntax using subsequent compiler plugins.
