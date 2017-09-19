@@ -164,15 +164,27 @@ function getSum() {
 }
 ```
 
-Not only does `&` preserve live bindings, but the destructuring syntax is also more statically analyzable than the `moduleNs` object, since it's more obvious which properties are being used and which are not, and a reference to the namespace object can never leak into hard-to-analyze code. This static analysis is the basis of important optimizations like "tree shaking," which (without this proposal) become significantly more difficult when dynamic `import()` is used.
+Not only does `&` preserve live bindings, but the destructuring syntax is also more statically analyzable than the `moduleNs` object, since it's more obvious which properties are being used and which are not, and a reference to the namespace object can never leak into hard-to-analyze code.
 
-The static analysis argument applies even if you choose to use the `Promise` API:
+This static analysis is the basis of important optimizations like "tree shaking," which (without this proposal) become significantly more difficult when dynamic `import()` is used.
+
+The static analysis argument applies even if you choose to use the `Promise` API, thanks to function parameter destructuring:
 
 ```js
 import("./module").then(({ &a, &b: c }) => {
   return () => a + c;
 });
 ```
+
+In fact, since every ECMAScript module has a namespace object, it should be possible to desugar any top-level `import` declaration to a combination of dynamic `import()`, top-level `await`, and referential destructuring:
+
+```js
+import def, { a, b as c } from "./module";
+// ...is roughly equivalent to...
+const { &default: def, &a, &b: c } = await import("./module");
+```
+
+If you enjoy explaining ECMAScript features in terms of other ECMAScript features as much as I do, then you'll understand why I find this analogy compelling.
 
 ## Relationship to nested `import` declarations
 
