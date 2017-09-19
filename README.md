@@ -256,7 +256,7 @@ Put another way, if the referential destructuring proposal makes progress, Babel
 
 I maintain another compiler for ECMAScript module syntax, called Reify, which [Meteor](https://github.com/meteor/meteor/) uses via [this Babel plugin](https://www.npmjs.com/package/babel-plugin-transform-es2015-modules-reify). Disclosure: I'm also the lead maintainer of Meteor.
 
-One of Reify's claimed benefits is that simulates live bindings better than the default Babel transform:
+One of Reify's claimed benefits is that it simulates live bindings better than the default Babel transform:
 
 ```js
 import a, { b, c as d } from "./module";
@@ -285,7 +285,7 @@ However, if referential destructuring was available, the generated code could be
 const { &default: a, &b, &c: d } = module.watch(require("./module"));
 ```
 
-This is beginning to look a lot like the code that Babel would generate. So much so, I'm not sure the Reify compiler would continue to exist as an alternative tool. And that's a good thing.
+This is beginning to look a lot like the code that Babel would generate. So much so, I'm not sure the Reify compiler should continue to exist as an alternative tool. And that's a good thing.
 
 
 ## Non-goals of this proposal
