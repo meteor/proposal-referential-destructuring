@@ -2,16 +2,15 @@
 
 **Stage:** 0, looking to advance to 1
 
-Stage 1 criteria:
+* Stage 1 criteria:
+  - [x] Identified “champion” who will advance the addition
+  - [x] Prose outlining the problem or need and the general shape of a solution
+  - [x] Illustrative examples of usage
+  - [x] High-level syntax
+  - [x] Discussion of key algorithms, abstractions and semantics
+  - [x] Identification of potential “cross-cutting” concerns and implementation challenges/complexity
 
-- [x] Identified “champion” who will advance the addition
-- [x] Prose outlining the problem or need and the general shape of a solution
-- [x] Illustrative examples of usage
-- [x] High-level syntax
-- [x] Discussion of key algorithms, abstractions and semantics
-- [x] Identification of potential “cross-cutting” concerns and implementation challenges/complexity
-
-While I have attempted to meet each of these criteria, I have certainly not identified/addressed all possible concerns.
+  While I have attempted to meet each of these criteria, I have certainly not identified/addressed all possible concerns. I'm mostly looking for acceptance of the goals of this proposal, and/or guidance about how to proceed.
 
 **Author:** [Ben Newman](https://github.com/benjamn)
 
