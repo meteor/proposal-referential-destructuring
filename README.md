@@ -208,7 +208,7 @@ I do not have a perfect solution for the second objection, other than to throw i
 
 While I could argue that these solutions are good enough to justify reviving the nested `import` proposal, the truth is that dynamic `import()` solves both problems already, and has much more momentum as an ECMAScript proposal.
 
-My one remaining regret is the loss of live bindings when using dynamic `import()` and destructuring together. In addition to its other benefits, referential destructuring solves this exact problem, and **I would be happy to withdraw the nested `import` proposal permanently if referential destructuring seems promising to the committee.**
+My one remaining regret is the loss of live bindings when using dynamic `import()` and destructuring together. In addition to its other benefits, referential destructuring solves this exact problem, and **I would be happy to withdraw the nested `import` proposal permanently if referential destructuring gains traction with the committee.**
 
 ## Relationship to [Babel](http://babeljs.io/)
 
