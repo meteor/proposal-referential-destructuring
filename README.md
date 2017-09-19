@@ -14,7 +14,7 @@
 
 ## Problem statement and rationale
 
-Currently, when an object is destructured by assignment to a left-hand-side _{Object,Array}{Binding,Assignment}Pattern_, the bound identifiers become "snapshots" of the state of the object at the moment of destructuring:
+Currently, when an object is destructured by assignment to a left-hand-side _{Object,Array}BindingPattern_, the bound identifiers become "snapshots" of the state of the object at the moment of destructuring:
 
 ```js
 let obj = { a: 1, b: 2 };
@@ -25,20 +25,23 @@ console.log(c); // still 2, not 12
 c += 1; // no effect on obj.b
 ```
 
-This behavior often matches the desires of the programmer, but not always. Sometimes, one would like for the bound identifier to remain a shorthand for the current value of the property in the destructured object, rather than a copy of some previous value.
+This value-shapshotting behavior often matches the desires of the programmer, but not always. Sometimes, one would like for the bound identifier to remain a shorthand for the current value of the property in the destructured object, rather than a copy of some previous value.
 
-This proposal introduces new syntax that would allow `c` to continue to refer to the `.b` property of the object that was originally destructured.
+In terms of the example above, this proposal introduces new syntax that would allow `c` to continue to refer to the `.b` property of the object that was originally destructured.
 
 At this stage, we are not committed to any specific syntax. For lack of a better color to paint the shed, I will adopt the ampersand (`&`) reference notation used by other languages (such as C++), because it seems not to collide with existing syntax.
 
 ## Examples
 
-In its most basic form, the `&` token may prefix keys in object patterns, indicating that the key should be bound as a reference to the given property in the parent object:
+In its most basic form, when the `&` token prefixes a key in an object pattern, it indicates that the key should be bound as a reference to that property in the parent object:
 
 ```js
+let obj = { a: 1, b: 2 };
 let { &a, &b: c } = obj;
-console.log(a); // same as console.log(obj.a)
-console.log(c); // same as console.log(obj.b)
+console.log(a); // 1, same as console.log(obj.a)
+console.log(c); // 2, same as console.log(obj.b)
+obj.b += 10;
+console.log(c); // 12
 ```
 
 Although the parent object in this case happens to be called `obj`, of course the object need not have a name:
@@ -57,6 +60,8 @@ console.log(_obj$0.a);
 console.log(_obj$0.b);
 ```
 
+where `_obj$0` is a temporary variable.
+
 The `&` syntax also works well with computed properties:
 
 ```js
@@ -71,7 +76,7 @@ const _obj$0 = getObject(), _key$0 = getKey();
 console.log(_obj$0[_key$0]);
 ```
 
-The `&` syntax works well with destructuring patterns in function parameter lists:
+The `&` syntax even works well with destructuring patterns in function parameter lists:
 
 ```js
 function f({ &x: y, setX }) {
@@ -98,7 +103,7 @@ y += 1111;
 console.log(obj.x); // 2345
 ```
 
-If this behavior is undesirable, simply use a `const` destructuring declaration instead:
+If this mutability is undesirable, simply use a `const` destructuring declaration instead:
 
 ```js
 const obj = { x: 1234 };
@@ -108,7 +113,7 @@ y += 1111; // throws
 
 As in other languages that support references, `const` references are likely to be regarded as a best practice, just as `const` declarations are preferred wherever possible.
 
-Note also that `y` is essentially an _immutable live binding_, much like a symbol imported by an `import` declaration. This insight leads us to the most compelling application of this sytax...
+Note also that `y` is essentially an _immutable live binding_, much like a symbol imported by an `import` declaration (though the original value resides in an object, rather than a module environment record). This insight leads us to the most compelling application of this sytax...
 
 ## Cooperation with dynamic `import()`
 
@@ -134,9 +139,9 @@ function getSum() {
 }
 ```
 
-Note that this example pretends `await` is allowed at the top level, which is a feature that has never been formally proposed, though this proposal is entirely compatible with top-level `await`.
+Note that this example pretends `await` is allowed at the top level, which is a feature that has never been formally proposed, though this proposal is fully compatible with top-level `await`.
 
-If you are tempted to use a destructuring declaration to bind individual identifiers with the desired names (`c` instead of `moduleNs.b`), then you lose the live binding behavior:
+If you are tempted to use a destructuring declaration to bind individual identifiers with the desired names (e.g., `c` instead of `moduleNs.b`), then you lose the live binding behavior:
 
 ```js
 const { a, b: c } = await import("./module");
@@ -152,7 +157,7 @@ function getSum() {
 
 If `./module` exports new values for `moduleNs.a` and `moduleNs.b`, those new values won't be visible to the `getSum` function, since it only has access to local variables that contain the original values.
 
-However, with referential destructuring, a simple change makes `a` and `c` behave as you would hope:
+However, with referential destructuring, the addition of two `&`s makes `a` and `c` behave as you would hope:
 
 ```js
 const { &a, &b: c } = await import("./module");
@@ -172,11 +177,12 @@ The static analysis argument applies even if you choose to use the `Promise` API
 
 ```js
 import("./module").then(({ &a, &b: c }) => {
+  // Return a closure that always has access to the latest values.
   return () => a + c;
-});
+}).then(...);
 ```
 
-In fact, since every ECMAScript module has a namespace object, it should be possible to desugar any top-level `import` declaration to a combination of dynamic `import()`, top-level `await`, and referential destructuring:
+In principle, since every ECMAScript module has a namespace object, it should be possible to desugar any top-level `import` declaration to a combination of dynamic `import()`, top-level `await`, and referential destructuring:
 
 ```js
 import def, { a, b as c } from "./module";
@@ -184,7 +190,7 @@ import def, { a, b as c } from "./module";
 const { &default: def, &a, &b: c } = await import("./module");
 ```
 
-If you enjoy explaining ECMAScript features in terms of other ECMAScript features as much as I do, then you'll understand why I find this analogy compelling.
+This desugaring won't work until both this proposal and top-level `await` are implemented, but I think harmonizing language features in this way is a worthwhile long-term goal.
 
 ## Relationship to nested `import` declarations
 
@@ -204,7 +210,7 @@ While I could argue that these solutions are good enough to justify reviving the
 
 My one remaining regret is the loss of live bindings when using dynamic `import()` and destructuring together. In addition to its other benefits, referential destructuring solves this exact problem, and **I would be happy to withdraw the nested `import` proposal permanently if referential destructuring seems promising to the committee.**
 
-## Transpiler appeal
+## Relationship to [Babel](http://babeljs.io/)
 
 If referential destructuring was already part of ECMAScript when [Babel](http://babeljs.io/) implemented [their ES2016-to-CommonJS modules transform](http://npmjs.org/package/babel-plugin-transform-es2015-modules-commonjs), then the `&` syntax would have made a very convenient compilation target.
 
@@ -232,6 +238,41 @@ console.log(a, c);
 and then transpile the referential destructuring syntax using subsequent compiler plugins.
 
 Put another way, if the referential destructuring proposal makes progress, Babel should consider adding support for `&` syntax to [their destructuring transform](https://www.npmjs.com/package/babel-plugin-transform-es2015-destructuring), which would allow the CommonJS modules transform to be significantly simplified.
+
+## Relationship to [Reify](https://github.com/benjamn/reify)
+
+I maintain another compiler for ECMAScript module syntax, called Reify, which [Meteor](https://github.com/meteor/meteor/) uses via [this Babel plugin](https://www.npmjs.com/package/babel-plugin-transform-es2015-modules-reify). Disclosure: I'm also the lead maintainer of Meteor.
+
+One of Reify's claimed benefits is that simulates live bindings better than the default Babel transform:
+
+```js
+import a, { b, c as d } from "./module";
+```
+
+becomes
+
+```js
+// Local symbols are declared as ordinary variables.
+let a, b, d;
+module.watch(require("./module"), {
+  // The keys of this object literal are the names of exported symbols.
+  // The values are setter functions that take new values and update the
+  // local variables.
+  default(value) { a = value; },
+  b(value) { b = value; },
+  c(value) { d = value; },
+});
+```
+
+Whenever `./module` exports a new value for `default`, `b`, or `c`, the callback function associated with that export will be called to update the local variable. No references need to be rewritten, since the simulated live bindings are just local variables, and those local variables are easier to inspect in a debugger.
+
+However, if referential destructuring was available, the generated code could be vastly simpler:
+
+```js
+const { &default: a, &b, &c: d } = module.watch(require("./module"));
+```
+
+This is beginning to look a lot like the code that Babel would generate. So much so, I'm not sure the Reify compiler would continue to exist as an alternative tool. And that's a good thing.
 
 ## Open questions
 
