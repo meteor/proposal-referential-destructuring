@@ -62,7 +62,7 @@ console.log(_obj$0.a);
 console.log(_obj$0.b);
 ```
 
-where `_obj$0` is a temporary variable.
+where `_obj$0` is a temporary variable. As this desugaring suggests, if `_obj$0.a` or `_obj$0.b` are implemented by getter properties, the getter function will be called whenever the bound identifier (e.g. `a` or `c`) is evaluated.
 
 The `&` syntax also works well with computed properties:
 
@@ -144,7 +144,7 @@ function getSum() {
 }
 ```
 
-Note that this example pretends `await` is allowed at the top level, which is a feature that has never been formally proposed, though this proposal is fully compatible with top-level `await`.
+> Note that this example pretends `await` is allowed at the top level, which is a feature that has never been formally proposed, though this proposal is fully compatible with top-level `await`.
 
 If you are tempted to use a destructuring declaration to bind individual identifiers with the desired names (e.g., `c` instead of `moduleNs.b`), then you lose the live binding behavior:
 
