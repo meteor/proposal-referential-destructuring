@@ -149,7 +149,7 @@ function getSum() {
 }
 ```
 
-> Note that this example pretends `await` is allowed at the top level, which is a feature that has never been formally proposed, though this proposal is fully compatible with top-level `await`.
+> Note that this example pretends `await` is allowed at the top level, which is a feature that has never been formally proposed, though this proposal should be compatible with top-level `await`.
 
 If you are tempted to use a destructuring declaration to bind individual identifiers with the desired names (e.g., `c` instead of `moduleNs.b`), then you lose the live binding behavior:
 
