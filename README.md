@@ -26,7 +26,7 @@ console.log(c); // still 2, not 12
 c += 1; // no effect on obj.b
 ```
 
-This value-shapshotting behavior often matches the desires of the programmer, but not always. Sometimes, one would like for the bound identifier to remain a shorthand for the current value of the property in the destructured object, rather than a copy of some previous value.
+This value-shapshotting behavior often matches the desires of the programmer, but not always. Sometimes, one would like for a bound identifier to remain a shorthand for the current value of a property in the destructured object, rather than a copy of some previous value.
 
 In terms of the example above, this proposal introduces new syntax that would allow `c` to continue to refer to the `.b` property of the object that was originally destructured.
 
