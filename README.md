@@ -2,6 +2,17 @@
 
 **Stage:** 0, looking to advance to 1
 
+Stage 1 criteria:
+
+- [x] Identified “champion” who will advance the addition
+- [x] Prose outlining the problem or need and the general shape of a solution
+- [x] Illustrative examples of usage
+- [x] High-level syntax
+- [x] Discussion of key algorithms, abstractions and semantics
+- [x] Identification of potential “cross-cutting” concerns and implementation challenges/complexity
+
+While I have attempted to meet each of these criteria, I have certainly not identified/addressed all possible concerns.
+
 **Author:** [Ben Newman](https://github.com/benjamn)
 
 **Reviewers:** TBD
@@ -120,7 +131,7 @@ console.log(y); // 2345
 y += 2222; // throws
 ```
 
-As in other languages with similar syntax, we anticipate that `const` references will come to be regarded as a best practice, just as `const` declarations are preferred wherever possible.
+As in other languages with similar syntax, I anticipate that `const` references will come to be regarded as a best practice, just as `const` declarations are preferred wherever possible.
 
 Note also that `y` is essentially an _immutable live binding_, much like a symbol imported by an `import` declaration (though the original value resides in an object, rather than a module environment record). This insight leads us to the most compelling application of this sytax...
 
