@@ -13,7 +13,7 @@
 **Transpiler:** TBD
 
 
-## Introduction
+## Overview
 
 Currently, when an object is destructured by assignment to a left-hand-side _ObjectBindingPattern_, the bound identifiers capture "snapshots" of the state of the object at the moment of destructuring:
 
