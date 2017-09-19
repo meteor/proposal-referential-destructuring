@@ -120,7 +120,7 @@ console.log(y); // 2345
 y += 2222; // throws
 ```
 
-As in other languages that support references, `const` references are likely to be regarded as a best practice, just as `const` declarations are preferred wherever possible.
+As in other languages with similar syntax, we anticipate that `const` references will come to be regarded as a best practice, just as `const` declarations are preferred wherever possible.
 
 Note also that `y` is essentially an _immutable live binding_, much like a symbol imported by an `import` declaration (though the original value resides in an object, rather than a module environment record). This insight leads us to the most compelling application of this sytax...
 
