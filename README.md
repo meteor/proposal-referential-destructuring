@@ -351,6 +351,33 @@ The syntax this proposal introduces doesn't really fit this traditional definiti
 Is there a better term for what this proposal introduces?
 
 
+### Interaction with default expressions?
+
+If an object destructuring pattern specifies a default expression for an optional property, that default property might or might not be used, since the property might or might not be found in the object:
+
+```js
+const {
+  a = 1,
+  b: c = 2,
+} = obj;
+```
+
+The `&` syntax still works for these properties, but it's not obvious what the semantics should be if the default expression is used:
+
+
+```js
+const {
+  &a = 1,
+  &b: c = 2,
+} = obj;
+```
+
+Two possibilities:
+
+1. If there is no `a` key in `obj`, then the `a` identifier should still be bound to the default value (`1`), and that value simply will not change. Code that consumes `a` doesn't have to know whether `a` is a referential binding, or just a normal variable.
+
+2. As long as `obj` has no `a` key, the value of the `a` identifier will be `1`. If `obj` eventually acquires an `a` key, the `a` identifier will begin evaluating to `obj.a` instead.
+
 ### Deeper nesting?
 
 A single `&` character declares a reference whose evaluation involves only one object property lookup:
