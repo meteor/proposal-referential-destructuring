@@ -12,9 +12,10 @@
 
 **Transpiler:** TBD
 
-## Problem statement and rationale
 
-Currently, when an object is destructured by assignment to a left-hand-side _ObjectBindingPattern_, the bound identifiers become "snapshots" of the state of the object at the moment of destructuring:
+## Introduction
+
+Currently, when an object is destructured by assignment to a left-hand-side _ObjectBindingPattern_, the bound identifiers capture "snapshots" of the state of the object at the moment of destructuring:
 
 ```js
 let obj = { a: 1, b: 2 };
@@ -32,6 +33,7 @@ In terms of the example above, this proposal introduces new syntax that would al
 Among its other benefits, this syntax should improve the usability of [dynamic `import()`](https://github.com/tc39/proposal-dynamic-import) in the way it handles [_live bindings_](http://2ality.com/2015/07/es6-module-exports.html), making alternate proposals like my [nested `import` declarations](https://github.com/benjamn/reify/blob/master/PROPOSAL.md) proposal unnecessary.
 
 At this stage, we are not committed to any specific syntax. For lack of a better color to paint the shed, I will adopt the ampersand (`&`) reference notation used by other languages (such as C++), because it seems not to collide with existing syntax.
+
 
 ## Examples
 
@@ -78,6 +80,8 @@ const _obj$0 = getObject(), _key$0 = getKey();
 console.log(_obj$0[_key$0]);
 ```
 
+Note that the `getKey()` expression is *not* reevaluated each time `value` is evaluated, but only once, at the time of destructuring.
+
 The `&` syntax even works well with destructuring patterns in function parameter lists:
 
 ```js
@@ -119,6 +123,7 @@ y += 2222; // throws
 As in other languages that support references, `const` references are likely to be regarded as a best practice, just as `const` declarations are preferred wherever possible.
 
 Note also that `y` is essentially an _immutable live binding_, much like a symbol imported by an `import` declaration (though the original value resides in an object, rather than a module environment record). This insight leads us to the most compelling application of this sytax...
+
 
 ## Cooperation with dynamic `import()`
 
@@ -197,6 +202,7 @@ const { &default: def, &a, &b: c } = await import("./module");
 
 This desugaring won't work until both this proposal and top-level `await` are implemented, but I think harmonizing language features in this way is a worthwhile long-term goal.
 
+
 ## Relationship to nested `import` declarations
 
 In the July 2016 TC39 meeting, I presented a [proposal](https://github.com/benjamn/reify/blob/master/PROPOSAL.md) to allow nesting `import` declarations inside blocks and functions, with support for live bindings. This proposal technically predated the dynamic `import()` proposal, though there was already talk of a module-scoped replacement for `System.import(id, parent)` at the time of my proposal.
@@ -214,6 +220,7 @@ I do not have a perfect solution for the second objection, other than to throw i
 While I could argue that these solutions are good enough to justify reviving the nested `import` proposal, the truth is that dynamic `import()` solves both problems already, and has much more momentum as an ECMAScript proposal.
 
 My one remaining regret is the loss of live bindings when using dynamic `import()` and destructuring together. In addition to its other benefits, referential destructuring solves this exact problem, and **I would be happy to withdraw the nested `import` proposal permanently if referential destructuring gains traction with the committee.**
+
 
 ## Relationship to [Babel](http://babeljs.io/)
 
@@ -243,6 +250,7 @@ console.log(a, c);
 and then transpile the referential destructuring syntax using subsequent compiler plugins.
 
 Put another way, if the referential destructuring proposal makes progress, Babel should consider adding support for `&` syntax to [their destructuring transform](https://www.npmjs.com/package/babel-plugin-transform-es2015-destructuring), which would allow the CommonJS modules transform to be significantly simplified.
+
 
 ## Relationship to [Reify](https://github.com/benjamn/reify)
 
@@ -279,9 +287,58 @@ const { &default: a, &b, &c: d } = module.watch(require("./module"));
 
 This is beginning to look a lot like the code that Babel would generate. So much so, I'm not sure the Reify compiler would continue to exist as an alternative tool. And that's a good thing.
 
+
+## Non-goals of this proposal
+
+### No references to identifiers
+
+In contrast to languages like C++, this proposal does not allow for references from one identifier to another:
+
+```js
+const &ref = someOtherVariable; // not allowed
+```
+
+Instead, just refer to `someOtherVariable`.
+
+
+### No reference parameters
+
+In languages like C++ and Scala, it's possible for a function to mutate the caller's copy of a variable passed as an argument to the function. This can be surprising if you aren't paying close attention to the signature and implementation of the function.
+
+The following code is not supported by this proposal:
+
+```js
+function illegal(a, &b) {
+  b = a + 1;
+}
+
+let a = 1, b = 2;
+illegal(a, b);
+```
+
+The `&` token is allowed in parameter lists only inside object destructuring patterns, which means it can only be used to modify the contents of caller-provided objects that were already mutable.
+
+
+### Not another `with` statement
+
+Unlike the widely-deprecated `with` statement, this proposal requires explicitly mentioning each reference property that you want to declare, and does not insert any new records into the scope chain.
+
+The presence of a `with` statement made it impossible to know, statically, whether a free variable inside the `with` block referred to a property of the `with` object or a variable from another enclosing scope.
+
+That was a disaster for static analysis and engine performance, but this proposal is no more problematic than the desugared code we've seen above.
+
+
 ## Open questions
 
 Although I hope the foregoing examples justify exploring this proposal further, there are several details that need to be worked out in order to make the proposal fully concrete.
+
+### Is there a better term than "referential destructuring"?
+
+JavaScript, like Java and many other languages, already has a concept of a "reference," meaning a variable that refers to a heap-allocated object. Heap-allocated objects are always passed by reference in JavaScript, rather than by value, and there are no "pointers" in the language that must be explicitly "dereferenced."
+
+The syntax this proposal introduces doesn't really fit this traditional definition of a "reference," though it is inspired by similar syntax in languages (like C++) that distinguish between pointers and references.
+
+Is there a better term for what this proposal introduces?
 
 ### Deeper nesting?
 
