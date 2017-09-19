@@ -353,7 +353,7 @@ Is there a better term for what this proposal introduces?
 
 ### Interaction with default expressions?
 
-If an object destructuring pattern specifies a default expression for an optional property, that default property might or might not be used, since the property might or might not be found in the object:
+If an object destructuring pattern specifies a default expression for an optional property, that default expression might or might not be used, since the property might or might not be found in the object:
 
 ```js
 const {
@@ -362,7 +362,7 @@ const {
 } = obj;
 ```
 
-The `&` syntax still works for these properties, but it's not obvious what the semantics should be if the default expression is used:
+The `&` syntax still works for these properties, but it's not obvious what the semantics should be when the default expression is used:
 
 
 ```js
