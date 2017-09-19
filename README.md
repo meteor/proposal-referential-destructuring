@@ -29,6 +29,8 @@ This value-shapshotting behavior often matches the desires of the programmer, bu
 
 In terms of the example above, this proposal introduces new syntax that would allow `c` to continue to refer to the `.b` property of the object that was originally destructured.
 
+Among its other benefits, this syntax should improve the usability of [dynamic `import()`](https://github.com/tc39/proposal-dynamic-import) in the way it handles [_live bindings_](http://2ality.com/2015/07/es6-module-exports.html), making alternate proposals like my [nested `import` declarations](https://github.com/benjamn/reify/blob/master/PROPOSAL.md) proposal unnecessary.
+
 At this stage, we are not committed to any specific syntax. For lack of a better color to paint the shed, I will adopt the ampersand (`&`) reference notation used by other languages (such as C++), because it seems not to collide with existing syntax.
 
 ## Examples
