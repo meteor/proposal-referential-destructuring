@@ -82,7 +82,7 @@ console.log(_obj$0[_key$0]);
 
 Note that the `getKey()` expression is *not* reevaluated each time `value` is evaluated, but only once, at the time of destructuring.
 
-The `&` syntax even works well with destructuring patterns in function parameter lists:
+The `&` syntax even works with destructuring patterns in function parameter lists:
 
 ```js
 function f({ &x: y, setX }) {
